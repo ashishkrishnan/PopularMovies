@@ -3,8 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="org.askdn.popularmovies.MainActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/most_pop"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="@string/title_mp"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/highestrated"
+        android:orderInCategory="100"
+        android:title="@string/title_highrated"
         app:showAsAction="never" />
 </menu>

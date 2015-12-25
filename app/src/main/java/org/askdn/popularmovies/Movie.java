@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 /**
  * Created by ashish on 25/12/15.
  */
+
 public class Movie {
     public String title;
     public String original_title;
@@ -18,6 +19,7 @@ public class Movie {
                  String release_date,
                  Bitmap movie_poster,
                  String overview) {
+
         this.title = title;
         this.original_title = original_title;
         this.vote_average = vote_average;
