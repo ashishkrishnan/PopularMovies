@@ -4,8 +4,10 @@
     <string name="title_mp">Most Popular</string>
     <string name="title_highrated">Highest Rated</string>
     <string name="moviedb_api" translatable="false">31249507e4eb311c24297f8dd10e84bf</string>
-    <string name="base_url" translatable="false">http://image.tmdb.org/t/p</string>
+    <string name="base_url" translatable="false">http://image.tmdb.org/t/p/</string>
     <string name="img_size">translatable="false">w185</string>
+    <string name="sort_popular">popularity.desc</string>
+    <string name="sort_rating">vote_average.desc</string>
 
     <!-- Strings related to themoviedb.org api call -->
     <string name="scheme">http</string>
@@ -15,5 +17,7 @@
     <string name="path1">discover</string>
     <string name="path2">movie</string>
     <string name="sort">sort_by</string>
+    <string name="title_activity_detail">DetailActivity</string>
+    <string name="action_settings">Settings</string>
 
 </resources>

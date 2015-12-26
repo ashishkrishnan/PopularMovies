@@ -1,6 +1,7 @@
 package org.askdn.popularmovies;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -14,7 +15,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
 
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,7 +38,7 @@ import java.util.ArrayList;
 public class MainActivityFragment extends Fragment {
 
     public static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
-    private View mrootView;
+    private View mRootView;
     public final String URI_RESPONSE_TYPE="GET";
     public final String URI_SCHEME;
     public final String URI_DOMAIN;
@@ -45,6 +50,10 @@ public class MainActivityFragment extends Fragment {
     public final String URI_API_KEY;
     private boolean mNetworkState=false;
 
+
+    public MovieAdapter mMovieAdapter;
+    public GridView mGridView;
+    public ArrayList<Movie> mMovieData;
     public MainActivityFragment() {
         URI_SCHEME = getString(R.string.scheme);
         URI_DOMAIN = getString(R.string.domain);
@@ -60,10 +69,13 @@ public class MainActivityFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         //super.onCreate(savedInstanceState);
 
+        mMovieData = new ArrayList<>();
         mNetworkState=((ConnectivityManager) getActivity()
                 .getSystemService(Context.CONNECTIVITY_SERVICE))
                 .getActiveNetworkInfo() != null;
         setHasOptionsMenu(true);
+        mMovieAdapter = new MovieAdapter(getActivity(), R.layout.movie_single_item, mMovieData);
+        mGridView.setAdapter(mMovieAdapter);
     }
 
     @Override
@@ -72,6 +84,7 @@ public class MainActivityFragment extends Fragment {
         inflater.inflate(R.menu.menu_main, menu);
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -79,6 +92,7 @@ public class MainActivityFragment extends Fragment {
         //noinspection SimplifiableIfStatement
         if (id == R.id.most_pop) {
             //Execute API call for Most Popular Movies
+            UpdateUI(getString(R.string.sort_popular));
         }
         if(id == R.id.highestrated)
         {
@@ -94,11 +108,11 @@ public class MainActivityFragment extends Fragment {
 
         if(mNetworkState==false) {
             // Check with replacing the Fragment with the No Internet Fragment
-            mrootView = inflater.inflate(R.layout.fragment_nointernet, container, false);
+            mRootView = inflater.inflate(R.layout.fragment_nointernet, container, false);
         } else {
-            mrootView = inflater.inflate(R.layout.fragment_main, container, false);
+            mRootView = inflater.inflate(R.layout.fragment_main, container, false);
         }
-        return mrootView;
+        return mRootView;
     }
 
     @Override
@@ -107,15 +121,21 @@ public class MainActivityFragment extends Fragment {
     }
 
     public String parseURI(String sortOrder) {
+        String url=null;
         Uri.Builder builder = new Uri.Builder();
-        builder.scheme(URI_SCHEME)
-                .authority(URI_DOMAIN)
-                .appendPath(URI_VERSION)
-                .appendPath(URI_DISCOVER)
-                .appendPath(URI_MOVIE)
-                .appendQueryParameter(URI_SORT,sortOrder)
-                .appendQueryParameter(URI_API_QUERY,URI_API_KEY);
-        return builder.build().toString();
+        if(sortOrder==getString(R.string.sort_popular)) {
+
+            builder.scheme(URI_SCHEME)
+                    .authority(URI_DOMAIN)
+                    .appendPath(URI_VERSION)
+                    .appendPath(URI_DISCOVER)
+                    .appendPath(URI_MOVIE)
+                    .appendQueryParameter(URI_SORT, sortOrder)
+                    .appendQueryParameter(URI_API_QUERY, URI_API_KEY);
+             url = builder.build().toString();
+            }
+
+        return url;
 
     }
     public void UpdateUI(String sortOrder) {
@@ -149,33 +169,30 @@ public class MainActivityFragment extends Fragment {
                 // Connect to a stream
                 InputStream is = urlConnection.getInputStream();
                 StringBuffer buffer = new StringBuffer();
-                if(is==null)
+                if (is == null)
                     return null;
 
                 reader = new BufferedReader(new InputStreamReader(is));
 
                 String line;
-                while((line=reader.readLine())!=null) {
-                    buffer.append(line+"\n");
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line + "\n");
                 }
-                if(buffer.length()==0) return null; // stream was empty
+                if (buffer.length() == 0) return null; // stream was empty
                 inputStringJSON = buffer.toString();
 
             } catch (IOException e) {
-                Log.e(LOG_TAG,"Error", e);
+                Log.e(LOG_TAG, "Error", e);
 
-            }
-
-            finally {
-                if(urlConnection!=null) {
+            } finally {
+                if (urlConnection != null) {
                     urlConnection.disconnect();
                 }
-                if(reader!=null) {
+                if (reader != null) {
                     try {
                         reader.close();
-                    }
-                    catch(IOException e) {
-                        Log.e(LOG_TAG,"Error closing data stream", e);
+                    } catch (IOException e) {
+                        Log.e(LOG_TAG, "Error closing data stream", e);
                     }
                 }
             }
@@ -188,22 +205,45 @@ public class MainActivityFragment extends Fragment {
             }
 
 
-
             return null;
         }
 
-        public ArrayList<Movie> getMovieData(String inputStringJSON) throws JSONException{
+        public ArrayList<Movie> getMovieData(String inputStringJSON) throws JSONException {
 
+            String poster_imgtitle, overview, release_date, original_title, title;
+            double vote_average;
             JSONObject data = new JSONObject(inputStringJSON);
+            JSONArray movielist = data.getJSONArray("results");
+            for (int i = 0; i <= movielist.length(); i++) {
 
-            // Begin Here;
+                JSONObject moviedetail = movielist.getJSONObject(i);
+                overview = moviedetail.getString("overview");
+                vote_average = moviedetail.getDouble("vote_average");
+                release_date = moviedetail.getString("release_date");
+                title = moviedetail.getString("title");
+                original_title = moviedetail.getString("original_title");
+                poster_imgtitle = getImageURL(moviedetail.getString("poster_path"));
+
+                mMovieData.add(new Movie(title, original_title, vote_average, release_date,
+                        poster_imgtitle, overview));
+            }
 
 
-
-            return null;
+            return mMovieData;
         }
 
+        public String getImageURL(String poster_imgtitle) {
+            return getString(R.string.base_url) + getString(R.string.img_size) + poster_imgtitle;
+        }
 
+        @Override
+        protected void onPostExecute(ArrayList<Movie> movies) {
+            if (movies != null) {
+                mMovieAdapter.setMovieData(movies);
+            } else {
+                Log.i(LOG_TAG, "Fetch Data failure");
+            }
+        }
     }
 
 }

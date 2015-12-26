@@ -11,13 +11,13 @@ public class Movie {
     public String original_title;
     public double vote_average ;
     public String release_date;
-    Bitmap movie_poster;
+    public String movie_poster;
     public String overview;
 
     public Movie(String title, String original_title,
                  double vote_average,
                  String release_date,
-                 Bitmap movie_poster,
+                 String movie_poster,
                  String overview) {
 
         this.title = title;
