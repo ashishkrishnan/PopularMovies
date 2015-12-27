@@ -1,6 +1,7 @@
 package org.askdn.popularmovies;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.Uri;
@@ -15,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.squareup.picasso.Picasso;
@@ -35,7 +37,7 @@ import java.util.ArrayList;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment implements AdapterView.OnItemClickListener{
 
     public static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
     private View mRootView;
@@ -142,6 +144,20 @@ public class MainActivityFragment extends Fragment {
 
         FetchMovieDetails task = new FetchMovieDetails();
         task.execute(parseURI(sortOrder));
+
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+        Movie selectItem = (Movie) parent.getItemAtPosition(position);
+        Intent showDetails = new Intent(getActivity(),DetailActivity.class);
+        showDetails.putExtra(getString(R.string.KEY_IMAGE),selectItem.movie_poster);
+        showDetails.putExtra(getString(R.string.KEY_OVERVIEW),selectItem.overview);
+        showDetails.putExtra(getString(R.string.KEY_RDATE),selectItem.release_date);
+        showDetails.putExtra(getString(R.string.KEY_TITLE),selectItem.title);
+        showDetails.putExtra(getString(R.string.KEY_VOTE),selectItem.vote_average);
+        startActivity(showDetails);
 
     }
 

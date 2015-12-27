@@ -9,6 +9,13 @@
     <string name="sort_popular">popularity.desc</string>
     <string name="sort_rating">vote_average.desc</string>
 
+    <string name="KEY_IMAGE">m_poster</string>
+    <string name="KEY_TITLE">m_title</string>
+    <string name="KEY_OVERVIEW">m_overview</string>
+    <string name="KEY_VOTE">m_vote</string>
+    <string name="KEY_RDATE">m_rdate</string>
+
+
     <!-- Strings related to themoviedb.org api call -->
     <string name="scheme">http</string>
     <string name="api_query_param">app_key</string>
