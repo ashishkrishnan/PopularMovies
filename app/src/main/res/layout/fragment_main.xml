@@ -1,13 +1,52 @@
-<GridView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:columnWidth="150dp"
-    android:numColumns="auto_fit"
-    android:verticalSpacing="0dp"
-    android:horizontalSpacing="0dp"
-    android:stretchMode="columnWidth"
-    tools:context=".MainActivityFragment"
-    android:id="@+id/movies_grid">
-</GridView>
+    android:orientation="vertical"
+    android:weightSum="1">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="end"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp">
+
+        <TextView
+            android:id="@+id/spinner_title"
+            android:padding="2dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/spinner_title"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            />
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+    </LinearLayout>
+    <GridView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:columnWidth="150dp"
+        android:padding="5dp"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="1dp"
+        android:horizontalSpacing="1dp"
+        android:stretchMode="columnWidth"
+        android:id="@+id/movies_grid">
+    </GridView>
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar"
+        android:layout_gravity="center" />
+
+</LinearLayout>

@@ -11,17 +11,18 @@
     tools:showIn="@layout/activity_detail">
 
     <TextView
+        style="@style/LayoutStandard"
+        android:layout_width="match_parent"
+        android:background="@color/colorPrimary"
         android:id="@+id/detail_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="20dp"
         android:textAppearance="?android:textAppearanceLarge"
-        android:textColor="@color/color_black"
-        android:text="@string/app_name"/>
+        android:textColor="@android:color/white"
+        android:text="@string/app_name"
+        android:layout_alignParentTop="true" />
 
     <ImageView
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         android:id="@+id/detail_poster"
         android:layout_below="@+id/detail_title"
         android:layout_alignParentLeft="true"
@@ -29,36 +30,64 @@
         android:layout_marginTop="29dp" />
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/detail_release"
-        android:text="@string/app_name"
-        android:layout_alignTop="@+id/detail_poster"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="50dp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/LayoutStandard"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="@string/app_name"
         android:id="@+id/detail_rating"
-        android:layout_below="@+id/detail_release"
-        android:layout_alignLeft="@+id/detail_release"
-        android:layout_alignStart="@+id/detail_release"
-        android:layout_marginTop="28dp" />
+        android:layout_below="@+id/static_detail_rating"
+        android:layout_toRightOf="@+id/detail_poster"
+        android:layout_toEndOf="@+id/detail_poster" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/app_name"
-        android:id="@+id/detail_overview"
+        android:text="@string/txt_release_title"
+        android:id="@+id/hard_release"
+        android:padding="1dp"
+        android:layout_marginTop="5dp"
         android:layout_below="@+id/detail_poster"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="25dp" />
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:padding="1dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="italic|bold"
+        android:text="@string/app_name"
+        android:id="@+id/detail_release"
+        android:layout_below="@+id/hard_release"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+
+    <ScrollView
+        style="@style/LayoutStandard"
+        android:layout_below="@+id/detail_release"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+        <TextView
+            style="@style/LayoutStandard"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/app_name"
+            android:padding="5dp"
+            android:id="@+id/detail_overview"
+            android:layout_below="@+id/detail_release"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="25dp" />
+    </ScrollView>
+    <TextView
+        style="@style/LayoutStandard"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/txt_rating_title"
+        android:id="@+id/static_detail_rating"
+        android:layout_alignTop="@+id/detail_poster"
+        android:layout_toRightOf="@+id/detail_poster"
+        android:layout_toEndOf="@+id/detail_poster"
+        android:layout_marginTop="77dp" />
 
 </RelativeLayout>

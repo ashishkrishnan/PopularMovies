@@ -1,14 +1,13 @@
 package org.askdn.popularmovies;
 
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.ConnectivityManager;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,9 +16,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
-
-import com.squareup.picasso.Picasso;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,54 +30,41 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 
 /**
- * A placeholder fragment containing a simple view.
- */
+ * The Fragment controlling Main UI view and Network Tasks
+ * */
 public class MainActivityFragment extends Fragment implements AdapterView.OnItemClickListener{
 
     public static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
     private View mRootView;
+    private ProgressBar mProgressBar=null;
     public final String URI_RESPONSE_TYPE="GET";
-    public final String URI_SCHEME;
-    public final String URI_DOMAIN;
-    public final String URI_VERSION;
-    public final String URI_DISCOVER;
-    public final String URI_MOVIE;
-    public final String URI_SORT;
-    public final String URI_API_QUERY;
-    public final String URI_API_KEY;
-    private boolean mNetworkState=false;
-
-
     public MovieAdapter mMovieAdapter;
     public GridView mGridView;
     public ArrayList<Movie> mMovieData;
-    public MainActivityFragment() {
-        URI_SCHEME = getString(R.string.scheme);
-        URI_DOMAIN = getString(R.string.domain);
-        URI_VERSION = getString(R.string.version);
-        URI_DISCOVER = getString(R.string.path1);
-        URI_MOVIE = getString(R.string.path2);
-        URI_SORT =getString(R.string.sort);
-        URI_API_QUERY = getString(R.string.api_query_param);
-        URI_API_KEY = getString(R.string.moviedb_api);
-    }
+
+    public MainActivityFragment() {}
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        //super.onCreate(savedInstanceState);
-
-        mMovieData = new ArrayList<>();
-        mNetworkState=((ConnectivityManager) getActivity()
-                .getSystemService(Context.CONNECTIVITY_SERVICE))
-                .getActiveNetworkInfo() != null;
+        super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        mMovieAdapter = new MovieAdapter(getActivity(), R.layout.movie_single_item, mMovieData);
-        mGridView.setAdapter(mMovieAdapter);
+        mMovieData = new ArrayList<>();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        SharedPreferences userpref = PreferenceManager
+                .getDefaultSharedPreferences(getActivity());
+        String userSortType = userpref.getString(getString(R.string.pref_sort_key),
+                getString(R.string.pref_sort_default));
+
+        //onStart Fetch Network Task based on the userPref
+        updateMovieUI(userSortType);
     }
 
     @Override
@@ -86,21 +73,14 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
         inflater.inflate(R.menu.menu_main, menu);
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.most_pop) {
-            //Execute API call for Most Popular Movies
-            UpdateUI(getString(R.string.sort_popular));
+        if (id == R.id.settings) {
+            Intent launchSettings = new Intent(getActivity(),SettingsActivity.class);
+            startActivity(launchSettings);
         }
-        if(id == R.id.highestrated)
-        {
-            //Execute API call for Highest Rated Movies
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -108,55 +88,88 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        if(mNetworkState==false) {
-            // Check with replacing the Fragment with the No Internet Fragment
-            mRootView = inflater.inflate(R.layout.fragment_nointernet, container, false);
-        } else {
-            mRootView = inflater.inflate(R.layout.fragment_main, container, false);
-        }
+        mRootView = inflater.inflate(R.layout.fragment_main, container, false);
+        mMovieAdapter = new MovieAdapter(getActivity(),new ArrayList<Movie>());
+        mProgressBar = (ProgressBar) mRootView.findViewById(R.id.progressBar);
+        mProgressBar.setVisibility(View.VISIBLE);
+        mGridView = (GridView) mRootView.findViewById(R.id.movies_grid);
+        mGridView.setAdapter(mMovieAdapter);
+        mProgressBar.setVisibility(View.VISIBLE);
+        mGridView.setOnItemClickListener(this);
+        initSpinner(mRootView);
         return mRootView;
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
+    // To build a Fetch URL for the data
+    public String getURL(String sortOrder) {
 
-    public String parseURI(String sortOrder) {
-        String url=null;
         Uri.Builder builder = new Uri.Builder();
-        if(sortOrder==getString(R.string.sort_popular)) {
-
-            builder.scheme(URI_SCHEME)
-                    .authority(URI_DOMAIN)
-                    .appendPath(URI_VERSION)
-                    .appendPath(URI_DISCOVER)
-                    .appendPath(URI_MOVIE)
-                    .appendQueryParameter(URI_SORT, sortOrder)
-                    .appendQueryParameter(URI_API_QUERY, URI_API_KEY);
-             url = builder.build().toString();
-            }
-
-        return url;
+            builder.scheme(getString(R.string.scheme))
+                    .authority(getString(R.string.domain))
+                    .appendPath(getString(R.string.version))
+                    .appendPath(getString(R.string.path1))
+                    .appendPath(getString(R.string.path2))
+                    .appendQueryParameter(getString(R.string.sort), sortOrder)
+                    .appendQueryParameter(getString(R.string.api_query_param),
+                            getString(R.string.moviedb_api));
+        return builder.build().toString();
 
     }
-    public void UpdateUI(String sortOrder) {
 
+    // executes the network tasks
+    public void updateMovieUI(String sortOrder) {
         FetchMovieDetails task = new FetchMovieDetails();
-        task.execute(parseURI(sortOrder));
+        task.execute(getURL(sortOrder));
+    }
 
+    //Intializes and Activates the Spinner for Quick Sorting
+    public void initSpinner(View view) {
+        Spinner spinner = (Spinner) view.findViewById(R.id.spinner);
+        //Adapter for setting up values
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+                              R.array.spinner_data, android.R.layout.simple_spinner_item);
+        //Set it for dropdown values
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        //Set a listener
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (position) {
+                    case 0:
+                        updateMovieUI(getString(R.string.sort_popular));
+                        break;
+                    case 1:
+                        updateMovieUI(getString(R.string.sort_rating));
+                        break;
+                    default:
+                        SharedPreferences userpref = PreferenceManager
+                                .getDefaultSharedPreferences(getActivity());
+                        String userSortType = userpref.getString(getString(R.string.pref_sort_key),
+                                getString(R.string.pref_sort_default));
+                        //onStart Fetch Network Task based on the userPref
+                        updateMovieUI(userSortType);
+                        break;
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+        //selects a single Movie Item from the GridView
         Movie selectItem = (Movie) parent.getItemAtPosition(position);
+
         Intent showDetails = new Intent(getActivity(),DetailActivity.class);
-        showDetails.putExtra(getString(R.string.KEY_IMAGE),selectItem.movie_poster);
-        showDetails.putExtra(getString(R.string.KEY_OVERVIEW),selectItem.overview);
-        showDetails.putExtra(getString(R.string.KEY_RDATE),selectItem.release_date);
-        showDetails.putExtra(getString(R.string.KEY_TITLE),selectItem.title);
-        showDetails.putExtra(getString(R.string.KEY_VOTE),selectItem.vote_average);
+        showDetails.putExtra(getString(R.string.KEY_IMAGE),selectItem.getPoster());
+        showDetails.putExtra(getString(R.string.KEY_OVERVIEW),selectItem.getOverview());
+        showDetails.putExtra(getString(R.string.KEY_RDATE),selectItem.getDate());
+        showDetails.putExtra(getString(R.string.KEY_TITLE),selectItem.gettitle());
+        showDetails.putExtra(getString(R.string.KEY_VOTE),selectItem.getVoteAvg());
         startActivity(showDetails);
 
     }
@@ -166,6 +179,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
         @Override
         protected ArrayList<Movie> doInBackground(String... params) {
 
+            //Fetches the Input String URL passed.
             String api_call_string = params[0];
 
             HttpURLConnection urlConnection = null;
@@ -220,44 +234,58 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
                 e.printStackTrace();
             }
 
-
             return null;
         }
 
+        //parses the Movie Data
         public ArrayList<Movie> getMovieData(String inputStringJSON) throws JSONException {
 
-            String poster_imgtitle, overview, release_date, original_title, title;
-            double vote_average;
+            final String RESULTS = "results";
+            final String TITLE = "title";
+            final String POSTER_PATH = "poster_path";
+            final String ORIGINAL_TITLE = "original_title";
+            final String OVERVIEW = "overview";
+            final String RELEASE_DATE = "release_date";
+            final String VOTE_AVERAGE = "vote_average";
+
+            String poster_imgtitle, overview, release_date, original_title, title,vote_average;
+            ArrayList<Movie> moviesDataList = new ArrayList<>();
+
             JSONObject data = new JSONObject(inputStringJSON);
-            JSONArray movielist = data.getJSONArray("results");
-            for (int i = 0; i <= movielist.length(); i++) {
+            JSONArray movielist = data.getJSONArray(RESULTS);
 
-                JSONObject moviedetail = movielist.getJSONObject(i);
-                overview = moviedetail.getString("overview");
-                vote_average = moviedetail.getDouble("vote_average");
-                release_date = moviedetail.getString("release_date");
-                title = moviedetail.getString("title");
-                original_title = moviedetail.getString("original_title");
-                poster_imgtitle = getImageURL(moviedetail.getString("poster_path"));
+            for (int i = 0; i <movielist.length(); i++) {
 
-                mMovieData.add(new Movie(title, original_title, vote_average, release_date,
-                        poster_imgtitle, overview));
+                JSONObject movieJSONdetail = movielist.getJSONObject(i);
+                overview = movieJSONdetail.getString(OVERVIEW);
+                vote_average = movieJSONdetail.getString(VOTE_AVERAGE);
+                release_date = movieJSONdetail.getString(RELEASE_DATE);
+                title = movieJSONdetail.getString(TITLE);
+                original_title = movieJSONdetail.getString(ORIGINAL_TITLE);
+                poster_imgtitle = getImageURL(movieJSONdetail.getString(POSTER_PATH));
+
+                moviesDataList.add(new Movie(title,original_title,vote_average,release_date,poster_imgtitle
+                                    ,overview));
+
             }
-
-
-            return mMovieData;
+            return moviesDataList;
         }
 
+        // Return a full image URL required for Imaging Processing and Caching
         public String getImageURL(String poster_imgtitle) {
             return getString(R.string.base_url) + getString(R.string.img_size) + poster_imgtitle;
         }
 
         @Override
-        protected void onPostExecute(ArrayList<Movie> movies) {
-            if (movies != null) {
-                mMovieAdapter.setMovieData(movies);
-            } else {
-                Log.i(LOG_TAG, "Fetch Data failure");
+        protected void onPostExecute(ArrayList<Movie> results) {
+            if (results != null)
+            {
+                mMovieAdapter.clear();
+                for (Movie movie : results)
+                {
+                    mMovieAdapter.add(movie);
+                }
+                mProgressBar.setVisibility(View.GONE);
             }
         }
     }

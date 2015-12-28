@@ -1,7 +1,5 @@
 package org.askdn.popularmovies;
 
-import android.graphics.Bitmap;
-
 /**
  * Created by ashish on 25/12/15.
  */
@@ -9,16 +7,14 @@ import android.graphics.Bitmap;
 public class Movie {
     public String title;
     public String original_title;
-    public double vote_average ;
+    public String vote_average ;
     public String release_date;
     public String movie_poster;
     public String overview;
 
-    public Movie(String title, String original_title,
-                 double vote_average,
-                 String release_date,
-                 String movie_poster,
-                 String overview) {
+    Movie(String title,String original_title, String vote_average, String release_date,
+           String movie_poster,
+           String overview) {
 
         this.title = title;
         this.original_title = original_title;
@@ -28,6 +24,16 @@ public class Movie {
         this.overview = overview;
     }
 
-
+    public String gettitle(){
+        return title;
+    }
+    public String getPoster() {return movie_poster;}
+    public String getVoteAvg() {
+        return vote_average;
+    }
+    public String getOverview() {
+        return overview;
+    }
+    public String getDate() {return release_date;}
 
 }

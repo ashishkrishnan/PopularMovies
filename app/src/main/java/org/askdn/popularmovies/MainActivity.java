@@ -3,9 +3,8 @@ package org.askdn.popularmovies;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 
+/*The Launcher Activity*/
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -14,28 +13,5 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.most_pop) {
-            //Execute API call for Most Popular Movies
-        }
-        if(id == R.id.highestrated)
-        {
-            //Execute API call for Highest Rated Movies
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }

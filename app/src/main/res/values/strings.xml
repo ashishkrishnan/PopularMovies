@@ -1,11 +1,24 @@
 <resources>
     <string name="app_name">PopularMovies</string>
-    <string name="no_internet">No Internet Connection!</string>
     <string name="title_mp">Most Popular</string>
+    <string name="action_settings">Settings</string>
     <string name="title_highrated">Highest Rated</string>
-    <string name="moviedb_api" translatable="false">31249507e4eb311c24297f8dd10e84bf</string>
-    <string name="base_url" translatable="false">http://image.tmdb.org/t/p/</string>
-    <string name="img_size">translatable="false">w185</string>
+    <string name="title_activity_detail">DetailActivity</string>
+    <string name="txt_release_title">Releasing on:</string>
+    <string name="txt_rating_title">Rating</string>
+
+    <string-array name="spinner_data">
+        <item>Most Popular</item>
+        <item>Highest Rated</item>
+    </string-array>
+
+    <string name="spinner_title">Sort By:</string>
+
+    <!-- Please add your themoviedb.org API here-->
+    <string name="moviedb_api" translatable="false"></string>
+
+    <string name="base_url">http://image.tmdb.org/t/p/</string>
+    <string name="img_size" translatable="false">w185</string>
     <string name="sort_popular">popularity.desc</string>
     <string name="sort_rating">vote_average.desc</string>
 
@@ -18,13 +31,24 @@
 
     <!-- Strings related to themoviedb.org api call -->
     <string name="scheme">http</string>
-    <string name="api_query_param">app_key</string>
+    <string name="api_query_param">api_key</string>
     <string name="domain">api.themoviedb.org</string>
     <string name="version">3</string>
     <string name="path1">discover</string>
     <string name="path2">movie</string>
     <string name="sort">sort_by</string>
-    <string name="title_activity_detail">DetailActivity</string>
-    <string name="action_settings">Settings</string>
 
+
+    <!-- String related to Settings Activity -->
+    <string name="pref_sort_title">Default sorting preference</string>
+    <string name="pref_sort_key">movie_sort_key</string>
+    <string name="pref_sort_default">popularity.desc</string>
+    <string-array name="pref_sort_names">
+        <item name="pref_popularity">by Popularity</item>
+        <item name="pref_rating">by Rating</item>
+    </string-array>
+    <string-array name="pref_sort_value">
+        <item name="pref_pvalue">popularity.desc</item>
+        <item name="pref_rvalue">vote_average.desc</item>
+    </string-array>
 </resources>

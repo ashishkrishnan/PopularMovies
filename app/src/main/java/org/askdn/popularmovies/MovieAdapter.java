@@ -1,8 +1,6 @@
 package org.askdn.popularmovies;
 
 import android.app.Activity;
-import android.content.Context;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,51 +11,50 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-import org.askdn.popularmovies.MainActivityFragment;
-
 /**
  * Created by ashish on 25/12/15.
  */
 public class MovieAdapter extends ArrayAdapter<Movie> {
 
 
-    private Context mContext;
-    private int mLayoutResourceId;
-    private ArrayList<Movie> mMovieData = new ArrayList<>();
-    public MovieAdapter(Activity context, int resourceid, ArrayList<Movie> movielist) {
-        super(context, resourceid, movielist);
-        this.mContext = context;
-        this.mLayoutResourceId = resourceid;
-        this.mMovieData = movielist;
-    }
-    public void setMovieData(ArrayList<Movie> movieData) {
-        this.mMovieData = movieData;
-        notifyDataSetChanged();
+    /**
+     * This is our own custom constructor (it doesn't mirror a superclass constructor).
+     * The context is used to inflate the layout file, and the List is the data we want
+     * to populate into the lists
+     *
+     * @param context        The current context. Used to inflate the layout file.
+     * @param griddata A ArrayList of Movie objects to display in a list
+     */
 
+    public MovieAdapter(Activity context, ArrayList<Movie> griddata) {
+        super(context, 0, griddata);
     }
+
+    /**
+     * Provides a view for an AdapterView (ListView, GridView, etc.)
+     *
+     * @param position    The AdapterView position that is requesting a view
+     * @param view The recycled view to populate.
+     *                    (search online for "android view recycling" to learn more)
+     * @param parent The parent ViewGroup that is used for inflation.
+     * @return The View for the position in the AdapterView.
+     */
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View view, ViewGroup parent) {
 
-        View row = convertView;
-        ViewHolder holder;
+        Movie item = getItem(position);
 
-        if(row == null) {
-            LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
-            row = inflater.inflate(mLayoutResourceId, parent, false);
-            holder = new ViewHolder();
-            holder.imageView = (ImageView) row.findViewById(R.id.movie_image);
-            row.setTag(holder);
-        } else {
-            holder = (ViewHolder) row.getTag();
+        // If the view is being set for the first time.
+        // View has not be recycled
+        if(view == null) {
+            view = LayoutInflater.from(
+                    getContext()).inflate(R.layout.movie_single_item, parent, false);
         }
+        ImageView imageView = (ImageView) view.findViewById(R.id.movie_image);
+        Picasso.with(getContext()).load(item.getPoster()).into(imageView);
+        return view;
+    }
 
-        Movie item = mMovieData.get(position);
-        Picasso.with(mContext).load(item.movie_poster).into(holder.imageView);
-        return row;
-    }
-    static class ViewHolder {
-        ImageView imageView;
-    }
 
 }
