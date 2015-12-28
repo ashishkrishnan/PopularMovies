@@ -52,7 +52,11 @@ public class MovieAdapter extends ArrayAdapter<Movie> {
                     getContext()).inflate(R.layout.movie_single_item, parent, false);
         }
         ImageView imageView = (ImageView) view.findViewById(R.id.movie_image);
-        Picasso.with(getContext()).load(item.getPoster()).into(imageView);
+        Picasso.with(getContext())
+                .load(item.getPoster())
+                .placeholder(R.drawable.loadingdefault)
+                .error(R.drawable.noimage)
+                .into(imageView);
         return view;
     }
 
