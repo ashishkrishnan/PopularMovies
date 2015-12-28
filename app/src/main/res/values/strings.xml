@@ -7,15 +7,14 @@
     <string name="txt_release_title">Releasing on:</string>
     <string name="txt_rating_title">Rating</string>
 
+    <!-- Please add your themoviedb.org API Key here-->
+    <string name="moviedb_api" translatable="false"></string>
+
     <string-array name="spinner_data">
         <item>Most Popular</item>
         <item>Highest Rated</item>
     </string-array>
-
     <string name="spinner_title">Sort By:</string>
-
-    <!-- Please add your themoviedb.org API here-->
-    <string name="moviedb_api" translatable="false"></string>
 
     <string name="base_url">http://image.tmdb.org/t/p/</string>
     <string name="img_size" translatable="false">w185</string>
