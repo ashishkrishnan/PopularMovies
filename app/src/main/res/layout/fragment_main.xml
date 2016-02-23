@@ -41,12 +41,4 @@
         android:stretchMode="columnWidth"
         android:id="@+id/movies_grid">
     </GridView>
-
-    <ProgressBar
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/progressBar"
-        android:layout_gravity="center" />
-
 </LinearLayout>

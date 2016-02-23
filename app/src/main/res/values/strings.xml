@@ -7,8 +7,10 @@
     <string name="txt_release_title">Releasing on:</string>
     <string name="txt_rating_title">Rating</string>
 
+
+    <!-- Sample API Key :31249507e4eb311c24297f8dd10e84bf -->
     <!-- Please add your themoviedb.org API Key here-->
-    <string name="moviedb_api" translatable="false"></string>
+    <string name="moviedb_api" translatable="false">31249507e4eb311c24297f8dd10e84bf</string>
 
     <string-array name="spinner_data">
         <item>Most Popular</item>

@@ -1,5 +1,6 @@
 package org.askdn.popularmovies;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -21,6 +22,9 @@ import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,8 +44,6 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
     public static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
     private View mRootView;
-    private ProgressBar mProgressBar=null;
-    public final String URI_RESPONSE_TYPE="GET";
     public MovieAdapter mMovieAdapter;
     public GridView mGridView;
     public ArrayList<Movie> mMovieData;
@@ -90,11 +92,8 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
         mRootView = inflater.inflate(R.layout.fragment_main, container, false);
         mMovieAdapter = new MovieAdapter(getActivity(),new ArrayList<Movie>());
-        mProgressBar = (ProgressBar) mRootView.findViewById(R.id.progressBar);
-        mProgressBar.setVisibility(View.VISIBLE);
         mGridView = (GridView) mRootView.findViewById(R.id.movies_grid);
         mGridView.setAdapter(mMovieAdapter);
-        mProgressBar.setVisibility(View.VISIBLE);
         mGridView.setOnItemClickListener(this);
         initSpinner(mRootView);
         return mRootView;
@@ -118,7 +117,8 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
     // executes the network tasks
     public void updateMovieUI(String sortOrder) {
-        FetchMovieDetails task = new FetchMovieDetails();
+        Context context = getContext();
+        FetchMovieDetails task = new FetchMovieDetails(context);
         task.execute(getURL(sortOrder));
     }
 
@@ -174,120 +174,6 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
     }
 
-    public class FetchMovieDetails extends AsyncTask<String, Void, ArrayList<Movie>> {
 
-        @Override
-        protected ArrayList<Movie> doInBackground(String... params) {
-
-            //Fetches the Input String URL passed.
-            String api_call_string = params[0];
-
-            HttpURLConnection urlConnection = null;
-            String inputStringJSON = null;
-            BufferedReader reader = null;
-
-            try {
-                // Create a new URL object
-                URL url = new URL(api_call_string);
-                // Open a URL connection
-                urlConnection = (HttpURLConnection) url.openConnection();
-                // Set the Connection Request Method
-                urlConnection.setRequestMethod(URI_RESPONSE_TYPE);
-                // Establish a connection
-                urlConnection.connect();
-
-                // Connect to a stream
-                InputStream is = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (is == null)
-                    return null;
-
-                reader = new BufferedReader(new InputStreamReader(is));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line + "\n");
-                }
-                if (buffer.length() == 0) return null; // stream was empty
-                inputStringJSON = buffer.toString();
-
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "Error", e);
-
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                        Log.e(LOG_TAG, "Error closing data stream", e);
-                    }
-                }
-            }
-
-            try {
-                return getMovieData(inputStringJSON);
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        //parses the Movie Data
-        public ArrayList<Movie> getMovieData(String inputStringJSON) throws JSONException {
-
-            final String RESULTS = "results";
-            final String TITLE = "title";
-            final String POSTER_PATH = "poster_path";
-            final String ORIGINAL_TITLE = "original_title";
-            final String OVERVIEW = "overview";
-            final String RELEASE_DATE = "release_date";
-            final String VOTE_AVERAGE = "vote_average";
-
-            String poster_imgtitle, overview, release_date, original_title, title,vote_average;
-            ArrayList<Movie> moviesDataList = new ArrayList<>();
-
-            JSONObject data = new JSONObject(inputStringJSON);
-            JSONArray movielist = data.getJSONArray(RESULTS);
-
-            for (int i = 0; i <movielist.length(); i++) {
-
-                JSONObject movieJSONdetail = movielist.getJSONObject(i);
-                overview = movieJSONdetail.getString(OVERVIEW);
-                vote_average = movieJSONdetail.getString(VOTE_AVERAGE);
-                release_date = movieJSONdetail.getString(RELEASE_DATE);
-                title = movieJSONdetail.getString(TITLE);
-                original_title = movieJSONdetail.getString(ORIGINAL_TITLE);
-                poster_imgtitle = getImageURL(movieJSONdetail.getString(POSTER_PATH));
-
-                moviesDataList.add(new Movie(title,original_title,vote_average,release_date,poster_imgtitle
-                                    ,overview));
-
-            }
-            return moviesDataList;
-        }
-
-        // Return a full image URL required for Imaging Processing and Caching
-        public String getImageURL(String poster_imgtitle) {
-            return getString(R.string.base_url) + getString(R.string.img_size) + poster_imgtitle;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Movie> results) {
-            if (results != null)
-            {
-                mMovieAdapter.clear();
-                for (Movie movie : results)
-                {
-                    mMovieAdapter.add(movie);
-                }
-                mProgressBar.setVisibility(View.GONE);
-            }
-        }
-    }
 
 }
