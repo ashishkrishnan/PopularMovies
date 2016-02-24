@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -19,22 +18,19 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 
+import org.askdn.popularmovies.network.FetchEngine;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -42,10 +38,13 @@ import java.util.ArrayList;
  * */
 public class MainActivityFragment extends Fragment implements AdapterView.OnItemClickListener{
 
+    static int count=0;
     public static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
     private View mRootView;
+    private RequestQueue mQueue;
     public MovieAdapter mMovieAdapter;
     public GridView mGridView;
+    private Context mContext;
     public ArrayList<Movie> mMovieData;
 
     public MainActivityFragment() {}
@@ -54,6 +53,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        mContext=getActivity();
         mMovieData = new ArrayList<>();
     }
 
@@ -67,23 +67,6 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
         //onStart Fetch Network Task based on the userPref
         updateMovieUI(userSortType);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(R.menu.menu_main, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.settings) {
-            Intent launchSettings = new Intent(getActivity(),SettingsActivity.class);
-            startActivity(launchSettings);
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -117,9 +100,71 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
     // executes the network tasks
     public void updateMovieUI(String sortOrder) {
-        Context context = getContext();
-        FetchMovieDetails task = new FetchMovieDetails(context);
-        task.execute(getURL(sortOrder));
+        Context context = getActivity().getApplication().getApplicationContext();
+        String url = getURL(sortOrder);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+               try {
+                   ArrayList<Movie> parsedMovie = parseJSON(response);
+                   if (parsedMovie != null)
+                   {
+                       mMovieAdapter.clear();
+                       for (Movie movie : parsedMovie)
+                       {
+                           mMovieAdapter.add(movie);
+                       }
+                   }
+            } catch (JSONException e)
+               {
+                   Log.e(LOG_TAG,"Error Parsing JSON");
+               }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+            }
+        });
+
+        // Adding Request to the Application Level Queue
+        FetchEngine.getInstance(context).getRequestQueue().add(jsonObjectRequest);
+    }
+
+    // Helper method for parsing JSON
+    public ArrayList<Movie> parseJSON(JSONObject response) throws JSONException{
+        final String RESULTS = "results";
+        final String TITLE = "title";
+        final String POSTER_PATH = "poster_path";
+        final String ORIGINAL_TITLE = "original_title";
+        final String OVERVIEW = "overview";
+        final String RELEASE_DATE = "release_date";
+        final String VOTE_AVERAGE = "vote_average";
+
+        String poster_imgtitle, overview, release_date, original_title, title,vote_average;
+        ArrayList<Movie> moviesDataList = new ArrayList<>();
+        JSONArray movielist = response.getJSONArray(RESULTS);
+
+        for (int i = 0; i <movielist.length(); i++) {
+
+            JSONObject movieJSONdetail = movielist.getJSONObject(i);
+            overview = movieJSONdetail.getString(OVERVIEW);
+            vote_average = movieJSONdetail.getString(VOTE_AVERAGE);
+            release_date = movieJSONdetail.getString(RELEASE_DATE);
+            title = movieJSONdetail.getString(TITLE);
+            original_title = movieJSONdetail.getString(ORIGINAL_TITLE);
+            poster_imgtitle = getImageURL(movieJSONdetail.getString(POSTER_PATH));
+
+            moviesDataList.add(new Movie(title, original_title, vote_average, release_date, poster_imgtitle
+                    , overview));
+        }
+        return moviesDataList;
+    }
+
+
+    // Return a full image URL required for Imaging Processing and Caching
+    public String getImageURL(String poster_imgtitle) {
+        return mContext.getString(R.string.base_url) + mContext.getString(R.string.img_size) + poster_imgtitle;
     }
 
     //Intializes and Activates the Spinner for Quick Sorting
@@ -143,12 +188,6 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
                         updateMovieUI(getString(R.string.sort_rating));
                         break;
                     default:
-                        SharedPreferences userpref = PreferenceManager
-                                .getDefaultSharedPreferences(getActivity());
-                        String userSortType = userpref.getString(getString(R.string.pref_sort_key),
-                                getString(R.string.pref_sort_default));
-                        //onStart Fetch Network Task based on the userPref
-                        updateMovieUI(userSortType);
                         break;
                 }
             }
@@ -173,7 +212,20 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
         startActivity(showDetails);
 
     }
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(R.menu.menu_main, menu);
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
 
-
+        if (id == R.id.settings) {
+            Intent launchSettings = new Intent(getActivity(),SettingsActivity.class);
+            startActivity(launchSettings);
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
