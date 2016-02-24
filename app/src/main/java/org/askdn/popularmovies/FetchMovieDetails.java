@@ -19,6 +19,9 @@ import java.util.ArrayList;
 /**
  * Created by ashish on 19/2/16.
  */
+
+
+// DEPRECATED
 public class FetchMovieDetails extends AsyncTask<String, Void, ArrayList<Movie>> { // Use okHTTP or Volley for making Network Calls.
 
     public MovieAdapter mMovieAdapter;

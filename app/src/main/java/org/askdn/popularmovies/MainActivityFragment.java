@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -19,22 +18,17 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 
-import org.json.JSONArray;
-import org.json.JSONException;
+import org.askdn.popularmovies.network.FetchEngine;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -42,8 +36,10 @@ import java.util.ArrayList;
  * */
 public class MainActivityFragment extends Fragment implements AdapterView.OnItemClickListener{
 
+    static int count=0;
     public static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
     private View mRootView;
+    private RequestQueue mQueue;
     public MovieAdapter mMovieAdapter;
     public GridView mGridView;
     public ArrayList<Movie> mMovieData;
@@ -67,23 +63,6 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
         //onStart Fetch Network Task based on the userPref
         updateMovieUI(userSortType);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(R.menu.menu_main, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.settings) {
-            Intent launchSettings = new Intent(getActivity(),SettingsActivity.class);
-            startActivity(launchSettings);
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -117,10 +96,24 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
     // executes the network tasks
     public void updateMovieUI(String sortOrder) {
-        Context context = getContext();
-        FetchMovieDetails task = new FetchMovieDetails(context,mMovieAdapter);
-        task.execute(getURL(sortOrder));
+        Context context = getActivity().getApplication().getApplicationContext();
+        String url = getURL(sortOrder);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.i(LOG_TAG+(count++),response.toString());
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        FetchEngine.getInstance(context).getRequestQueue().add(jsonObjectRequest);
     }
+
 
     //Intializes and Activates the Spinner for Quick Sorting
     public void initSpinner(View view) {
@@ -143,12 +136,6 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
                         updateMovieUI(getString(R.string.sort_rating));
                         break;
                     default:
-                        SharedPreferences userpref = PreferenceManager
-                                .getDefaultSharedPreferences(getActivity());
-                        String userSortType = userpref.getString(getString(R.string.pref_sort_key),
-                                getString(R.string.pref_sort_default));
-                        //onStart Fetch Network Task based on the userPref
-                        updateMovieUI(userSortType);
                         break;
                 }
             }
@@ -172,6 +159,22 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
         showDetails.putExtra(getString(R.string.KEY_VOTE),selectItem.getVoteAvg());
         startActivity(showDetails);
 
+    }
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        inflater.inflate(R.menu.menu_main, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.settings) {
+            Intent launchSettings = new Intent(getActivity(),SettingsActivity.class);
+            startActivity(launchSettings);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 
