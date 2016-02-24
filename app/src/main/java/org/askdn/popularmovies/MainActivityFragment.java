@@ -27,6 +27,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.askdn.popularmovies.network.FetchEngine;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -42,6 +44,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     private RequestQueue mQueue;
     public MovieAdapter mMovieAdapter;
     public GridView mGridView;
+    private Context mContext;
     public ArrayList<Movie> mMovieData;
 
     public MainActivityFragment() {}
@@ -50,6 +53,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        mContext=getActivity();
         mMovieData = new ArrayList<>();
     }
 
@@ -102,18 +106,66 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                Log.i(LOG_TAG+(count++),response.toString());
+               try {
+                   ArrayList<Movie> parsedMovie = parseJSON(response);
+                   if (parsedMovie != null)
+                   {
+                       mMovieAdapter.clear();
+                       for (Movie movie : parsedMovie)
+                       {
+                           mMovieAdapter.add(movie);
+                       }
+                   }
+            } catch (JSONException e)
+               {
+                   Log.e(LOG_TAG,"Error Parsing JSON");
+               }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
             }
         });
 
+        // Adding Request to the Application Level Queue
         FetchEngine.getInstance(context).getRequestQueue().add(jsonObjectRequest);
     }
 
+    // Helper method for parsing JSON
+    public ArrayList<Movie> parseJSON(JSONObject response) throws JSONException{
+        final String RESULTS = "results";
+        final String TITLE = "title";
+        final String POSTER_PATH = "poster_path";
+        final String ORIGINAL_TITLE = "original_title";
+        final String OVERVIEW = "overview";
+        final String RELEASE_DATE = "release_date";
+        final String VOTE_AVERAGE = "vote_average";
+
+        String poster_imgtitle, overview, release_date, original_title, title,vote_average;
+        ArrayList<Movie> moviesDataList = new ArrayList<>();
+        JSONArray movielist = response.getJSONArray(RESULTS);
+
+        for (int i = 0; i <movielist.length(); i++) {
+
+            JSONObject movieJSONdetail = movielist.getJSONObject(i);
+            overview = movieJSONdetail.getString(OVERVIEW);
+            vote_average = movieJSONdetail.getString(VOTE_AVERAGE);
+            release_date = movieJSONdetail.getString(RELEASE_DATE);
+            title = movieJSONdetail.getString(TITLE);
+            original_title = movieJSONdetail.getString(ORIGINAL_TITLE);
+            poster_imgtitle = getImageURL(movieJSONdetail.getString(POSTER_PATH));
+
+            moviesDataList.add(new Movie(title, original_title, vote_average, release_date, poster_imgtitle
+                    , overview));
+        }
+        return moviesDataList;
+    }
+
+
+    // Return a full image URL required for Imaging Processing and Caching
+    public String getImageURL(String poster_imgtitle) {
+        return mContext.getString(R.string.base_url) + mContext.getString(R.string.img_size) + poster_imgtitle;
+    }
 
     //Intializes and Activates the Spinner for Quick Sorting
     public void initSpinner(View view) {
@@ -176,7 +228,4 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
         }
         return super.onOptionsItemSelected(item);
     }
-
-
-
 }
