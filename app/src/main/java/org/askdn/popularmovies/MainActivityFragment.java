@@ -118,7 +118,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     // executes the network tasks
     public void updateMovieUI(String sortOrder) {
         Context context = getContext();
-        FetchMovieDetails task = new FetchMovieDetails(context);
+        FetchMovieDetails task = new FetchMovieDetails(context,mMovieAdapter);
         task.execute(getURL(sortOrder));
     }
 

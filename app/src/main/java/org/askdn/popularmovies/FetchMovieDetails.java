@@ -30,8 +30,9 @@ public class FetchMovieDetails extends AsyncTask<String, Void, ArrayList<Movie>>
     protected void onPreExecute() { }
 
 
-    FetchMovieDetails(Context context) {
+    FetchMovieDetails(Context context, MovieAdapter adapter) {
         mContext = context;
+        mMovieAdapter = adapter;
     }
 
     @Override
@@ -43,8 +44,6 @@ public class FetchMovieDetails extends AsyncTask<String, Void, ArrayList<Movie>>
         HttpURLConnection urlConnection = null;
         String inputStringJSON = null;
         BufferedReader reader = null;
-
-        Log.i(LOG_TAG,api_call_string);
         try {
             // Create a new URL object
             URL url = new URL(api_call_string);
@@ -85,7 +84,6 @@ public class FetchMovieDetails extends AsyncTask<String, Void, ArrayList<Movie>>
                 }
             }
         }
-        Log.i(LOG_TAG,inputStringJSON);
         try {
             return getMovieData(inputStringJSON);
         } catch (JSONException e) {
