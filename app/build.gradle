@@ -21,6 +21,9 @@ android {
     lintOptions {
         disable 'InvalidPackage'
     }
+    buildTypes.each {
+        it.buildConfigField 'String', 'TMDB_API_KEY', project.MyTmdbKey
+    }
 }
 
 

@@ -6,17 +6,19 @@ package org.askdn.popularmovies;
 
 public class Movie {
     public String title;
+    public long _ID;
     public String original_title;
     public String vote_average ;
     public String release_date;
     public String movie_poster;
     public String overview;
 
-    Movie(String title,String original_title, String vote_average, String release_date,
+    public Movie(long id, String title,String original_title, String vote_average, String release_date,
            String movie_poster,
            String overview) {
 
         this.title = title;
+        this._ID = id;
         this.original_title = original_title;
         this.vote_average = vote_average;
         this.movie_poster = movie_poster;
@@ -24,6 +26,7 @@ public class Movie {
         this.overview = overview;
     }
 
+    public long getID() { return _ID; }
     public String gettitle(){
         return title;
     }

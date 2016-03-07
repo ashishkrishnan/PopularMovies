@@ -9,6 +9,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 
 /**
@@ -17,14 +18,18 @@ import com.android.volley.toolbox.Volley;
 
 
 //Singleton Class for Volley
+//ImageLoader class not used yet
 public class FetchEngine {
+
     private static FetchEngine mInstance;
     private RequestQueue mRequestQueue;
     private static Context mFetchContext;
+    private ImageLoader mImageLoader;
 
     private FetchEngine(Context context) {
         mFetchContext = context;
         mRequestQueue = getRequestQueue();
+        mImageLoader = new ImageLoader(mRequestQueue, new LruBitmapCache(LruBitmapCache.getCacheSize(context)));
     }
 
     //Creating an Instance of the Singleton Class
@@ -38,18 +43,19 @@ public class FetchEngine {
     // Applying the RequestQueue for the Entire Application
     public RequestQueue getRequestQueue() {
         if(mRequestQueue == null) {
-            // Using Custom Implementation of Network and Cache
-            Cache cache = new DiskBasedCache(mFetchContext.getCacheDir(),10*1024*1024);
-            Network network = new BasicNetwork(new HurlStack());
-            mRequestQueue = new RequestQueue(cache,network);
-            mRequestQueue.start();
+            mRequestQueue = Volley.newRequestQueue(mFetchContext.getApplicationContext());
         }
       return mRequestQueue;
     }
 
     // Serving the Singleton RequestQueue for the all types of Volley Requests
     public <T> void addToRequestQueue(Request<T> req) {
+
         getRequestQueue().add(req);
+    }
+
+    public ImageLoader getImageLoader() {
+        return mImageLoader;
     }
 
 }

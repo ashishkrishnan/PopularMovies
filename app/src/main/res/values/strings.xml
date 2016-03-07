@@ -7,16 +7,15 @@
     <string name="txt_release_title">Releasing on:</string>
     <string name="txt_rating_title">Rating</string>
 
-
-    <!-- Sample API Key :31249507e4eb311c24297f8dd10e84bf -->
-    <!-- Please add your themoviedb.org API Key here-->
-    <string name="moviedb_api" translatable="false">31249507e4eb311c24297f8dd10e84bf</string>
-
     <string-array name="spinner_data">
         <item>Most Popular</item>
         <item>Highest Rated</item>
+        <item>Favourites</item>
     </string-array>
+
     <string name="spinner_title">Sort By:</string>
+    <string name="pref_spinner">spinner_pref</string>
+    <string name="saved_spinner_position">spinner_position</string>
 
     <string name="base_url">http://image.tmdb.org/t/p/</string>
     <string name="img_size" translatable="false">w185</string>
@@ -29,17 +28,6 @@
     <string name="KEY_VOTE">m_vote</string>
     <string name="KEY_RDATE">m_rdate</string>
 
-
-    <!-- Strings related to themoviedb.org api call -->
-    <string name="scheme">http</string>
-    <string name="api_query_param">api_key</string>
-    <string name="domain">api.themoviedb.org</string>
-    <string name="version">3</string>
-    <string name="path1">discover</string>
-    <string name="path2">movie</string>
-    <string name="sort">sort_by</string>
-
-
     <!-- String related to Settings Activity -->
     <string name="pref_sort_title">Default sorting preference</string>
     <string name="pref_sort_key">movie_sort_key</string>
@@ -47,9 +35,11 @@
     <string-array name="pref_sort_names">
         <item name="pref_popularity">by Popularity</item>
         <item name="pref_rating">by Rating</item>
+        <item name="perf_fav">by Favourites</item>
     </string-array>
     <string-array name="pref_sort_value">
         <item name="pref_pvalue">popularity.desc</item>
         <item name="pref_rvalue">vote_average.desc</item>
+        <item name="pref_fvalue">favourites</item>
     </string-array>
 </resources>

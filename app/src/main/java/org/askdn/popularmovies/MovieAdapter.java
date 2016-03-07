@@ -7,7 +7,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
+import com.android.volley.toolbox.ImageLoader;
 import com.squareup.picasso.Picasso;
+
+import org.askdn.popularmovies.network.FetchEngine;
 
 import java.util.ArrayList;
 
@@ -16,6 +19,8 @@ import java.util.ArrayList;
  */
 public class MovieAdapter extends ArrayAdapter<Movie> {
 
+
+    ImageLoader mImageLoader;
 
     /**
      * This is our own custom constructor (it doesn't mirror a superclass constructor).
@@ -52,11 +57,11 @@ public class MovieAdapter extends ArrayAdapter<Movie> {
                     getContext()).inflate(R.layout.movie_single_item, parent, false);
         }
         ImageView imageView = (ImageView) view.findViewById(R.id.movie_image);
-        Picasso.with(getContext())
-                .load(item.getPoster())
-                .placeholder(R.drawable.loadingdefault)
-                .error(R.drawable.noimage)
-                .into(imageView);
+
+        // Using FetchEngine (Volley Singleton) Loader to load up image
+        mImageLoader = FetchEngine.getInstance(getContext()).getImageLoader();
+        mImageLoader.get(item.getPoster(), ImageLoader.getImageListener(imageView,
+                R.drawable.loadingdefault, R.drawable.noimage));
         return view;
     }
 
