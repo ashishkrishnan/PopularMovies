@@ -140,9 +140,4 @@ public class Utility {
                 return builder.toString();
             }
 
-    public static void savedToPrefs(Context context, SharedPreferences sh, int position) {
-        SharedPreferences.Editor editor = sh.edit();
-        editor.putInt(context.getString(R.string.saved_spinner_position), position);
-        editor.commit();
-    }
 }

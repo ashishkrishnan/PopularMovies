@@ -43,7 +43,10 @@ import java.util.Map;
  * */
 public class MainActivityFragment extends Fragment implements AdapterView.OnItemClickListener{
 
-    //int count=0;
+    int mPosition=0;
+    public static final int SPIN_POPULAR = 0;
+    public static final int SPIN_RATING = 1;
+    public static final int SPIN_FAVOURITE = 2;
     public static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
     private View mRootView;
     private Spinner mSpinner;
@@ -76,9 +79,10 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
                     getString(R.string.pref_sort_default));
 
             if (userSortType.equals(byRating)) {
-
+                mPosition=1;
                 updateMovieUI(Utility.buildURLMovieRating());
             } else if (userSortType.equals(byPopularity)) {
+                mPosition=0;
                 updateMovieUI(Utility.buildURLMoviePopularity());
             }
         }
@@ -129,10 +133,6 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
 
     //Intializes and Activates the Spinner for Quick Sorting
     public void initSpinner(View view) {
-
-        /*//Spinner SharedPreferences
-        final SharedPreferences sharedPref = getActivity().getSharedPreferences(
-                getString(R.string.pref_spinner), Context.MODE_PRIVATE);*/
 
         mSpinner = (Spinner) view.findViewById(R.id.spinner);
         //Adapter for setting up values
@@ -201,8 +201,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     public void onResume() {
         super.onResume();
 
-       /* SharedPreferences sharedPreferences = getActivity().getSharedPreferences(getString(R.string.pref_spinner),Context.MODE_PRIVATE);
-        int saved_position = sharedPreferences.getInt(getString(R.string.saved_spinner_position),-1);
-        if(saved_position!=-1) mSpinner.setSelection(saved_position);*/
+        if(mPosition==0) mSpinner.setSelection(SPIN_POPULAR);
+        else if(mPosition==1) mSpinner.setSelection(SPIN_RATING);
     }
 }
