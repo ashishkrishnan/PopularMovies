@@ -8,7 +8,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
 import com.android.volley.toolbox.ImageLoader;
-import com.squareup.picasso.Picasso;
 
 import org.askdn.popularmovies.network.FetchEngine;
 

@@ -17,10 +17,10 @@ public class LruBitmapCache extends LruCache<String, Bitmap>
         super(maxSize);
     }
 
-    public LruBitmapCache(Context ctx) {
+   /* public LruBitmapCache(Context ctx) {
         this(getCacheSize(ctx));
     }
-
+*/
     @Override
     protected int sizeOf(String key, Bitmap value) {
         return value.getRowBytes() * value.getHeight();

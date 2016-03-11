@@ -3,7 +3,6 @@ package org.askdn.popularmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -21,39 +20,31 @@ import android.widget.GridView;
 import android.widget.Spinner;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.askdn.popularmovies.network.CustomRequest;
 import org.askdn.popularmovies.network.FetchEngine;
 import org.askdn.popularmovies.utils.JSONParser;
 import org.askdn.popularmovies.utils.Utility;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * The Fragment controlling Main UI view and Network Tasks
  * */
 public class MainActivityFragment extends Fragment implements AdapterView.OnItemClickListener{
 
-    int mPosition=0;
-    public static final int SPIN_POPULAR = 0;
-    public static final int SPIN_RATING = 1;
-    public static final int SPIN_FAVOURITE = 2;
-    public static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
-    private View mRootView;
+    private int mPosition=0;
+    private static final int SPIN_POPULAR = 0;
+    private static final int SPIN_RATING = 1;
+    private static final int SPIN_FAVOURITE = 2;
+    private static final String LOG_TAG = MainActivityFragment.class.getSimpleName()+":";
     private Spinner mSpinner;
-    private RequestQueue mQueue;
     public MovieAdapter mMovieAdapter;
     public GridView mGridView;
-    public ArrayList<Movie> mMovieData;
 
     public MainActivityFragment() {}
 
@@ -61,7 +52,6 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        mMovieData = new ArrayList<>();
     }
 
     @Override
@@ -92,13 +82,13 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        mRootView = inflater.inflate(R.layout.fragment_main, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         mMovieAdapter = new MovieAdapter(getActivity(),new ArrayList<Movie>());
-        mGridView = (GridView) mRootView.findViewById(R.id.movies_grid);
+        mGridView = (GridView) rootView.findViewById(R.id.movies_grid);
         mGridView.setAdapter(mMovieAdapter);
         mGridView.setOnItemClickListener(this);
-        initSpinner(mRootView);
-        return mRootView;
+        initSpinner(rootView);
+        return rootView;
     }
 
 
@@ -118,12 +108,12 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
                     }
                 }
                 catch (JSONException e) {
-
+                        Log.e(LOG_TAG+JSONException.class.getSimpleName(),e.toString());
                 }
         }}, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(LOG_TAG+":"+VolleyError.class.getSimpleName(),error.toString());
+                Log.e(LOG_TAG+VolleyError.class.getSimpleName(),error.toString());
             }
         });
 
@@ -132,7 +122,7 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
     }
 
     //Intializes and Activates the Spinner for Quick Sorting
-    public void initSpinner(View view) {
+    private void initSpinner(View view) {
 
         mSpinner = (Spinner) view.findViewById(R.id.spinner);
         //Adapter for setting up values

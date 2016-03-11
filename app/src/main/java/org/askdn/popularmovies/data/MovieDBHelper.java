@@ -5,7 +5,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import org.askdn.popularmovies.data.MovieContract.*;
+import org.askdn.popularmovies.data.MovieContract.MovieEntry;
+import org.askdn.popularmovies.data.MovieContract.ReviewEntry;
+import org.askdn.popularmovies.data.MovieContract.VideoEntry;
 
 /**
  * Created by ashish on 7/3/16.

@@ -1,18 +1,12 @@
 package org.askdn.popularmovies.utils;
 
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.util.Log;
 
 import org.askdn.popularmovies.BuildConfig;
-import org.askdn.popularmovies.Movie;
-import org.askdn.popularmovies.R;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 /**
  * Created by ashish on 7/3/16.
@@ -128,16 +122,23 @@ public class Utility {
     /*
      * This method creates a Url for fetching image for particular size
      */
-            public static String buildImageUrl(String path, String size) {
-                path = path.replaceFirst("\\/", "");
-                Uri.Builder builder = new Uri.Builder()
-                    .scheme(TMDB_URL_SCHEME)
-                    .authority(TMDB_BASE_URL_IMAGE_AUTHORITY)
-                    .appendPath(TMDB_IMG_PATH_T)
-                    .appendPath(TMDB_IMG_PATH_P)
-                    .appendPath(size)
-                    .appendPath(path);
+    public static String buildImageUrl(String path, String size) {
+        path = path.replaceFirst("\\/", "");
+        Uri.Builder builder = new Uri.Builder()
+                .scheme(TMDB_URL_SCHEME)
+                .authority(TMDB_BASE_URL_IMAGE_AUTHORITY)
+                .appendPath(TMDB_IMG_PATH_T)
+                .appendPath(TMDB_IMG_PATH_P)
+                .appendPath(size)
+                .appendPath(path);
                 return builder.toString();
             }
+
+    public static boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager)   context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
 
 }

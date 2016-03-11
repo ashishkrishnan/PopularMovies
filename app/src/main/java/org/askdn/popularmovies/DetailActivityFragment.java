@@ -18,9 +18,10 @@ import butterknife.ButterKnife;
 /**
  * A placeholder fragment containing a simple view.
  */
+@SuppressWarnings("unused")
 public class DetailActivityFragment extends Fragment {
 
-    private View mRootView;
+
     private Intent mGetDetils;
 
     public DetailActivityFragment() {}
@@ -35,10 +36,10 @@ public class DetailActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mRootView = inflater.inflate(R.layout.fragment_detail, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
         //Bind the ButterKnife to this view
-        ButterKnife.bind(this, mRootView);
+        ButterKnife.bind(this, rootView);
 
         //set the data from the Intent to be shown on the UI
         dTitle.setText(mGetDetils.getStringExtra(getString(R.string.KEY_TITLE)));
@@ -48,7 +49,7 @@ public class DetailActivityFragment extends Fragment {
 
         // Load the image from the Cache/Network
         Picasso.with(getContext()).load(mGetDetils.getStringExtra(getString(R.string.KEY_IMAGE))).into(dPoster);
-        return mRootView;
+        return rootView;
     }
 
     //Bind the UI using ref id to variables

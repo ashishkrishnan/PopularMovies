@@ -1,22 +1,14 @@
 package org.askdn.popularmovies.network;
 
 import android.content.Context;
-
-import com.android.volley.Cache;
-import com.android.volley.Network;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.BasicNetwork;
-import com.android.volley.toolbox.DiskBasedCache;
-import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 
 /**
  * Created by ashish on 24/2/16.
  */
-
-
 //Singleton Class for Volley
 //ImageLoader class not used yet
 public class FetchEngine {
@@ -41,7 +33,7 @@ public class FetchEngine {
     }
 
     // Applying the RequestQueue for the Entire Application
-    public RequestQueue getRequestQueue() {
+    private RequestQueue getRequestQueue() {
         if(mRequestQueue == null) {
             mRequestQueue = Volley.newRequestQueue(mFetchContext.getApplicationContext());
         }

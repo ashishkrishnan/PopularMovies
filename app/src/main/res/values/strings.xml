@@ -1,8 +1,6 @@
 <resources>
     <string name="app_name">PopularMovies</string>
-    <string name="title_mp">Most Popular</string>
     <string name="action_settings">Settings</string>
-    <string name="title_highrated">Highest Rated</string>
     <string name="title_activity_detail">DetailActivity</string>
     <string name="txt_release_title">Releasing on:</string>
     <string name="txt_rating_title">Rating</string>
@@ -15,8 +13,6 @@
 
     <string name="spinner_title">Sort By:</string>
 
-    <string name="base_url">http://image.tmdb.org/t/p/</string>
-    <string name="img_size" translatable="false">w185</string>
     <string name="sort_popular">popularity.desc</string>
     <string name="sort_rating">vote_average.desc</string>
 
@@ -40,4 +36,6 @@
         <item name="pref_rvalue">vote_average.desc</item>
         <item name="pref_fvalue">favourites</item>
     </string-array>
+
+    <string name="cd_movie_poster">Movie Image Poster</string>
 </resources>
