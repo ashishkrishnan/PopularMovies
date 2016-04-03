@@ -4,5 +4,6 @@
     android:name="org.askdn.popularmovies.DetailActivityFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/movie_detail_container"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:layout="@layout/fragment_detail" />

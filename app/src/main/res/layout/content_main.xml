@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:name="org.askdn.popularmovies.MainActivityFragment"
     android:layout_width="match_parent"
+    android:id="@+id/static_movie_fragment"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:layout="@layout/fragment_main" />
