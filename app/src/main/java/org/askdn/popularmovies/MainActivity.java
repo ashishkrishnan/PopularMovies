@@ -17,11 +17,10 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        View view = findViewById(R.id.movie_detail_container);
-        if(view!=null) {
+        if(findViewById(R.id.movie_detail_container)!=null) {
             mDualPane = true;
             if(savedInstanceState == null)
-            getSupportFragmentManager().beginTransaction().add(R.id.movie_detail_container,new DetailActivityFragment(),DFTAG).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.movie_detail_container,new DetailActivityFragment(),DFTAG).commit();
         }
         else
             mDualPane = false;
