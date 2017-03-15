@@ -117,8 +117,6 @@ public class MainActivityFragment extends Fragment implements AdapterView.OnItem
             }
         });
 
-        // Adding Request to the Application Level Queue
-        FetchEngine.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
     //Intializes and Activates the Spinner for Quick Sorting

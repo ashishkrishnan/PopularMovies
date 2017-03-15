@@ -37,7 +37,7 @@ public class FetchEngine {
         if(mRequestQueue == null) {
             mRequestQueue = Volley.newRequestQueue(mFetchContext.getApplicationContext());
         }
-      return mRequestQueue;
+      return this.mRequestQueue;
     }
 
     // Serving the Singleton RequestQueue for the all types of Volley Requests
